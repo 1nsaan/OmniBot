@@ -4,12 +4,5 @@ services:
     env: python
     plan: free # or another plan depending on your needs
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python bot.py"
-    envVars:
-      - key: TELEGRAM_API_KEY
-        value: "your-telegram-api-key" # Replace with your actual key or set in Render dashboard
-      - key: OPENWEATHER_API_KEY
-        value: "your-openweather-api-key" # Replace with your actual key or set in Render dashboard
-      - key: GOOGLE_API_KEY
-        value: "your-google-api-key" # Replace with your actual key or set in Render dashboard
+    startCommand: "python app.py"
     autoDeploy: true
