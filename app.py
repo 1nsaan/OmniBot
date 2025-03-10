@@ -41,6 +41,7 @@ convo = model.start_chat(history=[])
 # Initialize Telegram bot
 bot = telebot.TeleBot(TELEGRAM_API_KEY)
 
+
 # Intent detection functions
 def is_image_request(user_input):
     image_keywords = ["image", "img", "picture", "photo", "draw", "create", "generate"]
@@ -79,20 +80,25 @@ def handle_message(message):
             if match:
                 city_name = match.group(1).strip()
                 print(f"Weather city: {city_name}")
-                response = requests.get(
-                    f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={OPENWEATHER_API_KEY}"
-                )
-                data = json.loads(response.text)
-                if data["cod"] == 200:
-                    temp = data["main"]["temp"] - 273.15
-                    weather_response = f"Temperature in {city_name}: {temp:.1f}°C"
+                
+                url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={OPENWEATHER_API_KEY}&units=metric"
+                
+                response = requests.get(url)
+                data = response.json()
+                
+                if response.status_code == 200:
+                    temp = data["main"]["temp"]
+                    description = data["weather"][0]["description"].capitalize()
+                    weather_response = f"Weather in {city_name}: {temp:.1f}°C, {description}."
                     bot.reply_to(message, weather_response)
                 else:
-                    bot.reply_to(message, "City not found.")
+                    bot.reply_to(message, "City not found or API error.")
             else:
                 bot.reply_to(message, "Please specify a city.")
 
+
         else:
+            # Pass the context to Gemini with a directive for a short response
             prompt = f"{message.text}\n\nKeep your response short and concise (under 500 characters if possible)."
             convo.send_message(prompt)
             response = convo.last.text
@@ -106,6 +112,4 @@ def handle_message(message):
         print(f"An error occurred: {e}")
         bot.reply_to(message, "Sorry, I couldn't process your request.")
 
-if __name__ == "__main__":
-    print("Bot is starting...")
-    bot.infinity_polling()
+bot.infinity_polling()
