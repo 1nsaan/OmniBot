@@ -1,0 +1,6 @@
+telebot
+requests
+google-generativeai
+diffusers
+torch
+pillow
